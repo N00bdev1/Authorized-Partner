@@ -11,6 +11,55 @@ The signup flow requires email OTP verification. Rather than entering this manua
 - **Python** – required to run the project and power the OTP-reading script
 - **Gmail API** – used to retrieve the OTP email automatically
 
+## Project Structure
+
+```
+Authorized Partner/
+├── .venv/                          # Virtual environment (not committed to git)
+├── Helper/
+│   ├── credentials.json            # Gmail API OAuth client credentials (private, not committed)
+│   ├── gmail_reader.py             # Python script that fetches the OTP from Gmail
+│   └── token.json                  # Saved Gmail authorization token (private, not committed)
+├── Pages/
+│   └── SignUpPage.robot            # Keywords describing each signup action
+├── Resources/
+│   ├── Certificate/
+│   │   └── XYZ_Company_Registration.pdf   # Sample file used during the certificate upload step
+│   ├── Locators/
+│   │   └── SignUpLocators.robot    # Element locators (XPath/CSS) used to find fields on each page
+│   └── Variables/
+│       ├── Common.robot            # Shared values, such as the base URL, browser, and login credentials
+│       └── SignUpVariables.robot    # Test data used to fill out the signup form
+├── Results/                         # Generated after each run — log.html, report.html, screenshots
+├── Tests/
+│   └── SignUpAutomation.robot       # The test case that runs the full signup flow
+├── requirements.txt
+└── README.md
+```
+
+## Page Object Model (POM) Structure
+
+This project follows the **Page Object Model** pattern, which keeps locators, test data, actions, and test logic in separate files instead of mixing everything together. This makes the suite easier to read, update, and reuse.
+
+Each part plays a specific role:
+
+**1. Locators (`Resources/Locators/SignUpLocators.robot`)**
+Stores only the element locators — the XPath or CSS selectors used to find buttons, input fields, and links on the page. If the website's UI changes, only this file needs to be updated.
+
+**2. Variables (`Resources/Variables/`)**
+Stores the actual data used during testing — for example, the email, password, agency details, and so on. Keeping data separate from locators and logic means test data can be changed without touching any automation code.
+
+**3. Pages (`Pages/SignUpPage.robot`)**
+Defines reusable keywords that describe *actions* a user can take on a page — for example, `Fill personal details form` or `Click Signup Link`. Each keyword combines a locator (from the Locators file) with a value (from the Variables file) to perform one logical step. This is the core of the POM layer — it represents the page itself and what can be done on it.
+
+**4. Tests (`Tests/SignUpAutomation.robot`)**
+Contains the actual test case, which simply calls the keywords defined in the Pages file in the correct order to complete the full signup flow. The test file stays short and readable because all the implementation detail lives in the Pages, Locators, and Variables files.
+
+**5. Helper (`Helper/gmail_reader.py`)**
+A supporting Python script, used by the Pages layer to read the OTP from Gmail. It is not part of the POM itself, but supports one of the automation steps that Robot Framework alone cannot perform.
+
+This separation means that if the signup page's design changes, only the Locators file needs updating. If the test data changes, only the Variables file needs updating. The test case itself rarely needs to change.
+
 ## Prerequisites
 
 Before running the tests, make sure you have:
