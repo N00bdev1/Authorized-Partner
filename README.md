@@ -93,7 +93,7 @@ All test data lives in `Resources/Variables/SignUpVariables.robot`. These are du
 | ---------- | ------------------------------ |
 | First name | Alison                         |
 | Last name  | Maharjan                       |
-| Email      | alisontest6769+test1@gmail.com |
+| Email      | alisontest6769+test001@gmail.com |
 | Phone      | 9847309490                     |
 | Password   | I12bre@k4e                     |
 | Country    | Nepal                          |
@@ -148,11 +148,7 @@ This will:
 3. Verify the **My Profile** page loads on success
 4. Write `log.html`, `report.html`, and `output.xml` to the `Results/` folder
 
-To run all test files in the `Tests/` directory instead of a single file:
 
-```bash
-robot --outputdir Results Tests/
-```
 
 ---
 
