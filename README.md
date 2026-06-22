@@ -1,6 +1,6 @@
 # Signup Automation
 
-This project automates the agency signup process of Authorized partner website completing each step (personal details, OTP verification, agency information, professional experience, and business details) using **Robot Framework** and **Selenium**.
+This project automates the signup process of Authorized partner website completing each step (personal details, OTP verification, agency information, professional experience, and business details) using **Robot Framework** and **Selenium**.
 
 The signup flow requires email OTP verification. Rather than entering this manually, the script reads the OTP directly from Gmail using the Gmail API, so the verification step runs without any manual input.
 
