@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Robot Framework generated output
+Results/
+
+# Gmail API credentials - sensitive, never commit
+Helper/credentials.json
+Helper/token.json
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
