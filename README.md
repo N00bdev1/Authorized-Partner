@@ -1,168 +1,96 @@
-# Authorized Partner Signup Automation Test Suite — Execution Guide
+# Signup Automation
 
-Automated end-to-end test for the Agency Signup flow, built with **Robot Framework** + **SeleniumLibrary**, with automatic OTP retrieval via the **Gmail API**.
+This project automates the agency signup process on the platform — completing each step (personal details, OTP verification, agency information, professional experience, and business details) using **Robot Framework** and **Selenium**.
 
----
+The signup flow requires email OTP verification. Rather than entering this manually, the script reads the OTP directly from Gmail using the Gmail API, so the verification step runs without any manual input.
 
-## 1. Project Structure
+## Tech Stack
 
-```
-Authorized Partner/
-├── .venv/                          # Python virtual environment
-├── Helper/
-│   ├── credentials.json            # Gmail API OAuth client credentials
-│   ├── gmail_reader.py             # Python module — fetches the latest OTP email via Gmail API
-│   └── token.json                  # Auto-generated Gmail API auth token (created on first run)
-├── Pages/
-│   └── SignUpPage.robot            # Keyword definitions for each signup step (page object layer)
-├── Resources/
-│   ├── Certificate/
-│   │   └── XYZ_Company_Registration.pdf   # Sample file uploaded during the "Business & Preferences" step
-│   ├── Locators/
-│   │   └── SignUpLocators.robot    # All element locators used by SignUpPage.robot
-│   └── Variables/
-│       ├── Common.robot            # Shared variables (base URL, browser, login credentials, etc.)
-│       └── SignUpVariables.robot    # Test data for the signup form (name, email, agency details, etc.)
-├── Results/                         # Robot Framework output (log.html, report.html, output.xml) — generated after each run
-├── Tests/
-│   └── SignUpAutomation.robot       # Test case(s) — the actual automation flow
-├── requirements.txt
-└── Signup automation.mp4            # Demo video recording of a full run
-```
+- **Robot Framework** – test execution framework
+- **SeleniumLibrary** – browser automation (Chrome)
+- **Python** – required to run the project and power the OTP-reading script
+- **Gmail API** – used to retrieve the OTP email automatically
 
----
+## Prerequisites
 
-## 2. Tech Stack
-
-| Component          | Details                                                         |
-| ------------------ | --------------------------------------------------------------- |
-| Test framework     | Robot Framework                                                 |
-| Browser automation | SeleniumLibrary                                                 |
-| Language           | Python 3                                                        |
-| OTP retrieval      | Google Gmail API (`gmail_reader.py`)                            |
-| Browser            | Chrome (via Selenium WebDriver)                                 |
-| Report/Log output  | Robot Framework native HTML reports (`log.html`, `report.html`) |
-
----
-
-## 3. Prerequisites
-
-- Python 3.9+ installed and on PATH
+Before running the tests, make sure you have:
+- Python 3.9 or newer installed
 - Google Chrome installed
-- ChromeDriver matching your installed Chrome version (or use Selenium Manager / `webdriver-manager`, which resolves this automatically if configured)
-- A Gmail account used to receive the OTP emails during signup, with Gmail API access enabled (see setup below)
+- A Gmail account to receive the signup OTP emails
 
----
+## Setup Instructions
 
-## 4. Environment Setup
+1. **Open a terminal in the project root folder.**
 
-1. **Clone/copy the project** and open a terminal in the project root (`Authorized Partner/`).
-
-2. **Create and activate a virtual environment**
-
+2. **Create a virtual environment.** This keeps the project's dependencies isolated from other Python projects on your machine.
    ```bash
    python -m venv .venv
-   # Windows
-   .venv\Scripts\activate
-   # macOS/Linux
-   source .venv/bin/activate
    ```
 
-3. **Install dependencies**
+3. **Activate the virtual environment.**
+   ```bash
+   .venv\Scripts\activate
+   ```
+   On macOS/Linux, use `source .venv/bin/activate` instead.
 
+4. **Install the required dependencies.**
    ```bash
    pip install -r requirements.txt
    ```
 
-   This installs Robot Framework, SeleniumLibrary, and the Google API client libraries used by `gmail_reader.py`.
+5. **Set up Gmail API access (one-time setup).**
+   - Open Google Cloud Console and enable the Gmail API for a project.
+   - Create an OAuth Client ID and select "Desktop app" as the application type.
+   - Download the credentials file and save it as `Helper/credentials.json`.
+   - On the first test run, a browser window will open asking you to log in and authorize access to the Gmail account. Approve this once — the authorization is saved afterward, so it won't ask again on future runs.
 
-4. **Gmail API setup (one-time)**
-   - In Google Cloud Console, enable the **Gmail API** for a project and create an **OAuth 2.0 Client ID** (Desktop app).
-   - Download the OAuth client file and save it as `Helper/credentials.json`.
-   - On the first test run, `gmail_reader.py` will open a browser window to authorize access to the test Gmail inbox and will save the resulting session as `Helper/token.json`. Subsequent runs reuse this token automatically (no need to re-authorize unless it expires or is revoked).
+## Running the Tests
 
----
-
-## 5. Test Data / Accounts Used
-
-All test data lives in `Resources/Variables/SignUpVariables.robot`. These are dummy/test values (no real personal or business data):
-
-**Personal information**
-
-| Field      | Value                          |
-| ---------- | ------------------------------ |
-| First name | Alison                         |
-| Last name  | Maharjan                       |
-| Email      | alisontest6769+test001@gmail.com |
-| Phone      | 9847309490                     |
-| Password   | I12bre@k4e                     |
-| Country    | Nepal                          |
-
-**Agency details**
-
-| Field          | Value           |
-| -------------- | --------------- |
-| Agency name    | XYX company     |
-| Role           | QA engineer     |
-| Agency email   | xyz10@gmail.com |
-| Agency website | www.xyz.com     |
-| Agency address | Kathmandu       |
-| Region         | Nepal           |
-
-**Professional experience**
-
-| Field               | Value      |
-| ------------------- | ---------- |
-| Years of experience | 2 years    |
-| Student numbers     | 200        |
-| Success metrics     | 80         |
-| Focus area          | IT courses |
-
-**Business & preferences**
-
-| Field                        | Value                                                                      |
-| ---------------------------- | -------------------------------------------------------------------------- |
-| Business registration number | 20011                                                                      |
-| Certification details        | ICEF Certified Education Agent                                             |
-| Registration certificate     | `D:/Authorized Partner/Resources/Certificate/XYZ_Company_Registration.pdf` |
-
-- **OTP verification account**: the Gmail inbox connected via `credentials.json` / `token.json` (the `+test1` alias on the personal email above) — must be the same inbox that receives the signup OTP email for the `${email}` used during signup.
-- **Login account**: defined in `Resources/Variables/Common.robot` (`${email}`, `${password}`) — used to log in before starting signup.
-
-> Note: `${registration_certificate}` is currently an absolute local path (`D:/Authorized Partner/...`). If running on another machine, update this path or switch to a relative path under `Resources/Certificate/`.
-
----
-
-## 6. How to Run
-
-From the project root, with the virtual environment activated:
-
+Once setup is complete, run the test suite with:
 ```bash
 robot --outputdir Results Tests/SignUpAutomation.robot
 ```
 
-This will:
+This launches Chrome, completes the signup form from start to finish, retrieves the OTP from Gmail automatically, and verifies that the profile page loads successfully at the end.
 
-1. Launch the browser and open the site (`Open Website`)
-2. Walk through Login → Signup → Personal Details → OTP Verification → Agency Details → Professional Experience → Business & Preferences
-3. Verify the **My Profile** page loads on success
-4. Write `log.html`, `report.html`, and `output.xml` to the `Results/` folder
+## Viewing the Results
 
+After execution, the `Results` folder will contain:
+- **report.html** – a summary of which steps passed or failed
+- **log.html** – a detailed, step-by-step execution log with screenshots if a step fails
 
+Open either file in a browser to review the run.
 
----
+## Test Data Used
 
-## 7. Viewing Results
+All form data used during signup is defined in `Resources/Variables/SignUpVariables.robot`. This is dummy/test data and does not represent real personal or business information.
 
-After execution, open the following from the `Results/` folder:
+**Email account used for testing**
 
-- `report.html` — high-level pass/fail summary
-- `log.html` — detailed step-by-step execution log, including screenshots on failure
+The OTP must be received by a real Gmail inbox, since the script reads it directly from that account. This project was tested using:
 
----
+```
+alisontest6769@gmail.com
+```
 
-## 8. Notes
+If you are running this project yourself, use an email alias under the same inbox so the OTP still reaches an account you control, while keeping each test run's email unique. Gmail supports this using the `+` alias format — for example:
 
-- `gmail_reader.py`'s `Get Latest Otp` keyword polls the inbox for the most recent OTP email within a 60-second timeout; ensure the Gmail account has no stale/old OTP emails that could be picked up by mistake.
-- The suite includes a `Sleep` before reading the OTP to allow email delivery time — adjust this value if OTP emails arrive slower/faster in your environment.
-- A demo recording of a full run is included as `Signup automation.mp4`.
+```
+alisontest6769+test123@gmail.com
+```
+
+Replace `123` with any number of your choosing. Emails sent to this alias still land in the same `alisontest6769@gmail.com` inbox, so OTP retrieval will continue to work without any extra configuration.
+
+**Phone number**
+
+The phone number field in `SignUpVariables.robot` should be updated to your own phone number before running the tests, since the platform may validate or use this field during signup.
+
+**Other test data fields**
+
+The remaining values (agency name, agency details, professional experience, business registration number, etc.) are placeholder values and can be left as-is or customized as needed.
+
+## Notes
+
+- `credentials.json` and `token.json` are private Gmail authorization files. Do not share or upload these publicly.
+- The certificate file used during the upload step is a sample PDF located in `Resources/Certificate/`.
+- If running this project on a different machine, confirm that the certificate file path in `SignUpVariables.robot` still points to a valid location.
